@@ -1,6 +1,8 @@
 use error_chain::error_chain;
 use std::io::Read;
 use reqwest;
+use serde::Deserialize;
+use reqwest::header::USER_AGENT;
 
 error_chain!{
     foreign_links{
@@ -9,10 +11,32 @@ error_chain!{
     }
 }
 
+#[derive(Debug, Deserialize)]
+struct User {
+    login: String,
+    id : u32,
+}
+
 fn main()  {
     blocking_request();
     async_request();
+    get_stars();
 }
+
+#[tokio::main]
+async fn get_stars() -> Result<()>{
+    let url = format!("https://api.github.com/repos/{owner}/{repo}/stargazers",
+    owner="rust-lang-nursery",
+    repo = "rust-cookbook");
+
+    let response = reqwest::Client::new().get(&url).header(USER_AGENT, "rust demo")
+        .send().await?;
+
+    let users : Vec<User> = response.json().await?;
+    println!("users : {:?}", users);
+    Ok(())
+}
+
 
 #[tokio::main]
 async fn async_request() -> Result<()> {
