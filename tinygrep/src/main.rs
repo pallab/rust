@@ -4,10 +4,8 @@ use tinygrep::Config;
 
 
 fn main() {
-    let args : Vec<String> = env::args().collect();
-    dbg!(&args);
 
-    let config = Config::parse(&args).unwrap_or_else(|err| {
+    let config = Config::parse(env::args()).unwrap_or_else(|err| {
         eprintln!("{err}");
         process::exit(1);
     });

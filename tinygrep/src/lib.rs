@@ -8,17 +8,22 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn parse(args: &Vec<String>) -> Result<Config, String> {
-        if &args.len() != &(3 as usize) {
-            return Err("Please provide exactly two arguments. Ex : <file> <expression>".to_string());
+    pub fn parse(mut args: impl Iterator<Item=String>) -> Result<Config, &'static str> {
+        if(args.next().is_none()) {
+            return Err("Please provide exactly two arguments. Ex : <file> <expression>");
         }
 
-        Ok(
-            Config {
-                file: args[1].clone(),
-                query: args[2].clone(),
-            }
-        )
+        let file = match args.next() {
+            Some(f) => f,
+            None => return Err("Provide file path"),
+        };
+
+        let query = match args.next() {
+            Some(f) => f,
+            None => return Err("Provide query"),
+        };
+
+        Ok( Config { file, query} )
     }
 }
 
